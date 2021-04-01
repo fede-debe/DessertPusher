@@ -29,6 +29,10 @@ import androidx.lifecycle.LifecycleObserver
 import com.example.android.dessertpusher.databinding.ActivityMainBinding
 import timber.log.Timber
 
+const val KEY_REVENUE = "key_revenue"
+const val KEY_DESSERT_SOLD = "key_dessertSold"
+const val KEY_DESSERT_TIMER = "key_dessertTimer"
+
 class MainActivity : AppCompatActivity(), LifecycleObserver {
 
     private var revenue = 0
@@ -80,6 +84,13 @@ class MainActivity : AppCompatActivity(), LifecycleObserver {
         // Dessert Timer
         dessertTimer = DessertTimer(this.lifecycle)
 
+        if (savedInstanceState != null) {
+            revenue = savedInstanceState.getInt(KEY_REVENUE, 0)
+            dessertsSold = savedInstanceState.getInt(KEY_DESSERT_SOLD, 0)
+            dessertTimer.secondsCount = savedInstanceState.getInt(KEY_DESSERT_TIMER, 0)
+
+        }
+
         // Set the TextViews to the right values
         binding.revenue = revenue
         binding.amountSold = dessertsSold
@@ -87,6 +98,8 @@ class MainActivity : AppCompatActivity(), LifecycleObserver {
         // Make sure the correct dessert is showing
         binding.dessertButton.setImageResource(currentDessert.imageId)
     }
+
+
 
     /**
      * Updates the score when the dessert is clicked. Possibly shows a new dessert.
@@ -155,6 +168,19 @@ class MainActivity : AppCompatActivity(), LifecycleObserver {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt("key_revenue", revenue)
+        outState.putInt("key_dessertSold", dessertsSold)
+        outState.putInt("key_dessertTimer", dessertTimer.secondsCount)
+        Timber.i("onSaveInstanceState called")
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        Timber.i("onRestoreInstanceState is called")
+    }
+
     override fun onStart() {
         super.onStart()
        // Log.i("MainActivity", "onStart called")
@@ -170,6 +196,7 @@ class MainActivity : AppCompatActivity(), LifecycleObserver {
         super.onResume()
         Timber.i("onResume called")
     }
+
 
     override fun onDestroy() {
         super.onDestroy()
